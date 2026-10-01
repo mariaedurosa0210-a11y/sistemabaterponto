@@ -1,0 +1,15 @@
+127.0.0.1 - - [01/Oct/2026 19:41:25] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:41:25] "GET /css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:41:25] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:41:26] "GET /js/supabaseClient.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:41:26] "GET /js/camera.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:42:28] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:42:28] "GET /css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:42:28] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:42:29] "GET /js/supabaseClient.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:42:29] "GET /js/camera.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:43:38] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:43:38] "GET /css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:43:38] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:43:38] "GET /js/supabaseClient.js HTTP/1.1" 200 -
+127.0.0.1 - - [01/Oct/2026 19:43:38] "GET /js/camera.js HTTP/1.1" 200 -
