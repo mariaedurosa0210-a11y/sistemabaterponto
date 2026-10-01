@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Totem de Registro de Ponto</title>
+
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Lucide Icons CDN (Sem Emojis na UI) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Print.js CDN para Impressão de Comprovante Ticket -->
+  <script src="https://printjs-4000.codingo.me/v1/print.min.js"></script>
+</head>
+<body>
+
+  <!-- Header Navbar -->
+  <header class="app-header">
+    <div class="brand">
+      <i data-lucide="clock"></i>
+      <span>PONTO WEB KIOSK</span>
+    </div>
+
+    <div class="clock-display">
+      <div id="clock-time" class="clock-time">00:00:00</div>
+      <div id="clock-date" class="clock-date">Carregando data...</div>
+    </div>
+
+    <button id="btn-open-config" class="config-btn" title="Configurações Supabase">
+      <i data-lucide="settings"></i>
+    </button>
+  </header>
+
+  <!-- Container Principal Kiosk -->
+  <main class="main-container">
+
+    <!-- Painel Esquerdo: Identificação e Teclado Numérico -->
+    <section class="card-panel">
+      <h2 class="card-title">
+        <i data-lucide="user-check"></i>
+        Identificação do Funcionário
+      </h2>
+
+      <div class="matricula-input-group">
+        <label for="matricula-display" style="font-size: 0.875rem; color: var(--color-text-secondary);">Digite sua Matrícula:</label>
+        <input
+          type="text"
+          id="matricula-display"
+          class="matricula-display"
+          placeholder="0000"
+          autocomplete="off"
+          maxlength="10"
+        />
+      </div>
+
+      <!-- Teclado Numérico Virtual -->
+      <div id="keypad-grid" class="keypad-grid">
+        <button class="key-btn" data-key="1">1</button>
+        <button class="key-btn" data-key="2">2</button>
+        <button class="key-btn" data-key="3">3</button>
+        <button class="key-btn" data-key="4">4</button>
+        <button class="key-btn" data-key="5">5</button>
+        <button class="key-btn" data-key="6">6</button>
+        <button class="key-btn" data-key="7">7</button>
+        <button class="key-btn" data-key="8">8</button>
+        <button class="key-btn" data-key="9">9</button>
+        <button class="key-btn action-btn clear-btn" data-action="clear">
+          <i data-lucide="trash-2"></i>
+        </button>
+        <button class="key-btn" data-key="0">0</button>
+        <button class="key-btn action-btn" data-action="backspace">
+          <i data-lucide="delete"></i>
+        </button>
+      </div>
+
+      <button id="btn-validar-matricula" class="primary-btn" style="margin-top: 0.5rem;" onclick="document.getElementById('keypad-grid').dispatchEvent(new CustomEvent('click', {bubbles: true}))">
+        <i data-lucide="search"></i>
+        Buscar Funcionário
+      </button>
+
+      <!-- Cartão de Informação do Funcionário Localizado -->
+      <div id="employee-card" class="employee-card" style="display: none;">
+        <div id="employee-name" class="employee-name">Nome do Funcionário</div>
+        <div id="employee-details" class="employee-details">Matrícula: 1001</div>
+      </div>
+    </section>
+
+    <!-- Painel Direito: Câmera & Tipo de Batida -->
+    <section class="card-panel">
+      <h2 class="card-title">
+        <i data-lucide="camera"></i>
+        Validação Visual & Registro
+      </h2>
+
+      <!-- Camera Feed Box -->
+      <div class="camera-container">
+        <video id="camera-video" class="camera-video" autoplay playsinline muted></video>
+        <div id="camera-badge" class="camera-badge">
+          <i data-lucide="video"></i>
+          Iniciando câmera...
+        </div>
+      </div>
+
+      <!-- Seletor do Tipo de Batida -->
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 600;">Selecione o Tipo de Registro:</label>
+        <div id="punch-types-grid" class="punch-types-grid">
+          <button class="btn-punch" data-tipo="ENTRADA" disabled>
+            <i data-lucide="log-in"></i>
+            Entrada
+          </button>
+          <button class="btn-punch" data-tipo="SAIDA_ALMOCO" disabled>
+            <i data-lucide="utensils"></i>
+            Saída Almoço
+          </button>
+          <button class="btn-punch" data-tipo="RETORNO_ALMOCO" disabled>
+            <i data-lucide="coffee"></i>
+            Retorno Almoço
+          </button>
+          <button class="btn-punch" data-tipo="SAIDA" disabled>
+            <i data-lucide="log-out"></i>
+            Saída
+          </button>
+        </div>
+      </div>
+
+      <!-- Botão de Confirmação do Ponto -->
+      <button id="btn-confirm-punch" class="primary-btn" disabled>
+        <i data-lucide="check-circle"></i>
+        Confirmar e Registrar Ponto
+      </button>
+    </section>
+  </main>
+
+  <!-- Modal: Comprovante (Ticket) de Registro de Ponto -->
+  <div id="ticket-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Comprovante de Ponto</h3>
+        <button id="btn-close-ticket" style="background: none; border: none; cursor: pointer; color: var(--color-text-secondary);">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div id="ticket-content" class="ticket-container">
+        <div class="ticket-header">
+          <h3>Comprovante de Registro de Ponto</h3>
+          <p style="font-size: 0.75rem;">Sistema de Ponto Eletrônico</p>
+        </div>
+
+        <div class="ticket-row">
+          <span>Funcionário:</span>
+          <strong id="ticket-nome">-</strong>
+        </div>
+        <div class="ticket-row">
+          <span>Matrícula:</span>
+          <strong id="ticket-matricula">-</strong>
+        </div>
+        <div class="ticket-row">
+          <span>Tipo de Registro:</span>
+          <strong id="ticket-tipo">-</strong>
+        </div>
+        <div class="ticket-row">
+          <span>Data / Hora Oficial:</span>
+          <strong id="ticket-datahora">-</strong>
+        </div>
+        <div class="ticket-row">
+          <span>Status da Jornada:</span>
+          <strong id="ticket-status">-</strong>
+        </div>
+
+        <div>
+          <span style="font-size: 0.75rem; color: #555;">Hash SHA-256 de Autenticidade:</span>
+          <div id="ticket-hash" class="ticket-hash">-</div>
+        </div>
+
+        <div class="ticket-footer">
+          Documento gerado e autenticado digitalmente
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btn-print-ticket" class="primary-btn" style="flex: 1;">
+          <i data-lucide="printer"></i>
+          Imprimir Comprovante
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Configurações de API do Supabase -->
+  <div id="config-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Configurações do Supabase</h3>
+        <button id="btn-close-config" style="background: none; border: none; cursor: pointer; color: var(--color-text-secondary);">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600;">Supabase Project URL:</label>
+          <input type="text" id="cfg-url" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.9rem;" placeholder="https://xyz.supabase.co" />
+        </div>
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600;">Supabase Anon Key:</label>
+          <input type="password" id="cfg-key" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.9rem;" placeholder="eyJhbGciOi..." />
+        </div>
+      </div>
+
+      <button id="btn-save-config" class="primary-btn">
+        <i data-lucide="save"></i>
+        Salvar Alterações
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="status-toast" class="status-toast">
+    Mensagem de notificação
+  </div>
+
+  <!-- Script Principal via ES Module -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
